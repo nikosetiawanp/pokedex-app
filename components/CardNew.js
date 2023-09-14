@@ -1,9 +1,9 @@
 import { TouchableOpacity, Text, View, StyleSheet, Image } from "react-native";
 import { useEffect, useState } from "react";
+import Home from "../";
 
 export default function CardNew(props) {
   const [pokemon, setPokemon] = useState();
-
   async function fetchPokemon(url) {
     try {
       const response = await fetch(url);
@@ -52,12 +52,11 @@ export default function CardNew(props) {
           top: 20,
         }}
       >
-        {pokemon.id.length == 1
-          ? `#00${pokemon.id}`
-          : pokemon.id.length == 2
-          ? `#0${pokemon.id}`
-          : `#${pokemon.id}`}
-        {/* #0{pokemon?.id} */}
+        {pokemon?.id !== undefined && pokemon?.id.length == 1
+          ? `#00${pokemon?.id}`
+          : pokemon?.id.length == 2
+          ? `#0${pokemon?.id}`
+          : `#${pokemon?.id}`}
       </Text>
       <Image
         source={{ uri: pokemon?.sprites.front_default }}

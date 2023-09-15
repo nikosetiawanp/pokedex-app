@@ -1,25 +1,27 @@
 import { TouchableOpacity, Text, View, StyleSheet, Image } from "react-native";
 import { useEffect, useState } from "react";
-import Home from "../";
 
-export default function CardNew(props) {
+export default function SingleCard(props) {
   const [pokemon, setPokemon] = useState();
+
   async function fetchPokemon(url) {
     try {
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         setPokemon(data);
-        // console.log(data.sprites.front_default);
       }
     } catch (error) {
       console.log(error);
     }
   }
+
   useEffect(() => {
-    fetchPokemon(props.pokemon?.url);
-    console.log(props.pokemon?.url);
-  }, [props.pokemon?.url]);
+    fetchPokemon(
+      `https://pokeapi.co/api/v2/pokemon/${props.pokemon?.name.toLowerCase()}/`
+    );
+    console.log(pokemon);
+  }, [props.pokemon?.name]);
 
   return (
     <TouchableOpacity
@@ -68,8 +70,8 @@ export default function CardNew(props) {
           shadowRadius: 5,
           shadowOpacity: 0.2,
         }}
-        onLoad={() => console.log("Image loaded successfully")}
-        onError={() => console.log("Image failed to load")}
+        // onLoad={() => console.log("Image loaded successfully")}
+        // onError={() => console.log("Image failed to load")}
       />
       <Text
         style={{

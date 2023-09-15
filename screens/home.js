@@ -6,22 +6,27 @@ import {
   Dimensions,
   ScrollView,
   Button,
+  LogBox,
 } from "react-native";
 
 import { useEffect, useState } from "react";
-import CardNew from "../components/CardNew";
+import Card from "../components/Card";
+import SingleCard from "../components/SingleCard";
 
 export default function Home(props) {
-  const [pokemons, setPokemons] = useState([]);
   const [searchInput, setSearchInput] = useState("");
+  const [pokemons, setPokemons] = useState([]);
+  const [offset, setOffset] = useState(0);
   const windowWidth = Dimensions.get("window").width;
 
-  const apiUrl = "https://pokeapi.co/api/v2/pokemon/?limit=25&offset=500";
+  const url = `https://pokeapi.co/api/v2/pokemon/?limit=25&offset=${
+    offset * 20
+  }`;
+  const searchUrl = `https://pokeapi.co/api/v2/pokemon/${searchInput.toLowerCase()}/`;
 
   async function fetchPokemons(url) {
     try {
       const response = await fetch(url);
-
       if (response.ok) {
         const data = await response.json();
         setPokemons(data.results);
@@ -32,8 +37,32 @@ export default function Home(props) {
   }
 
   useEffect(() => {
-    fetchPokemons(apiUrl);
-  }, []);
+    fetchPokemons(url);
+  }, [offset]);
+
+  async function searchPokemon() {
+    try {
+      const response = await fetch(searchUrl);
+      if (response.ok) {
+        const data = await response.json();
+        setPokemons([data]);
+        console.log(pokemons[0].name);
+      } else {
+        console.log(response.ok);
+        setPokemons([]);
+      }
+    } catch (error) {
+      console.log(error);
+      setPokemons([]);
+    }
+  }
+
+  const mappedPokemons = pokemons.map((pokemon) => (
+    <Card key={pokemon.id} pokemon={pokemon} />
+  ));
+  const foundPokemon = pokemons.map((pokemon) => (
+    <SingleCard key={pokemon.id} pokemon={pokemon} />
+  ));
 
   return (
     <View style={styles.container}>
@@ -41,10 +70,13 @@ export default function Home(props) {
         <Text style={styles.heading}>Pokédex</Text>
         <Text style={styles.subheading}>Search for Pokémon by name</Text>
         <TextInput
+          autoComplete="off"
           editable
+          autoFocus
           value={searchInput}
+          onChangeText={(text) => setSearchInput(text)}
+          onSubmitEditing={searchPokemon}
           placeholder="What Pokémon are you looking for?"
-          onChange={(e) => setSearchInput(e.target.value)}
           style={{
             padding: 20,
             backgroundColor: "whitesmoke",
@@ -54,16 +86,20 @@ export default function Home(props) {
             marginBottom: 10,
           }}
         />
-        <Button
+        {/* <Button
           title="Go to detail"
           onPress={({ navigation }) => props.navigation.navigate("Detail")}
-        />
+        /> */}
       </View>
       {/* CARD CONTAINER */}
       <ScrollView style={styles.cardContainer}>
-        {pokemons.map((pokemon) => (
-          <CardNew key={pokemon.id} pokemon={pokemon} />
-        ))}
+        {pokemons.length > 1 ? (
+          mappedPokemons
+        ) : pokemons.length === 1 ? (
+          foundPokemon
+        ) : (
+          <Text>Not Found</Text>
+        )}
       </ScrollView>
       <View
         style={{
@@ -73,9 +109,23 @@ export default function Home(props) {
           width: windowWidth,
           borderTopColor: "lightgray",
           borderTopWidth: 0.5,
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          paddingHorizontal: 20,
           // padding: 30,
         }}
-      ></View>
+      >
+        <Button
+          title="Prev"
+          onPress={() => setOffset((current) => current - 1)}
+          disabled={offset === 0 ? true : false}
+        />
+        <Button
+          title="Next"
+          onPress={() => setOffset((current) => current + 1)}
+        />
+      </View>
     </View>
   );
 }

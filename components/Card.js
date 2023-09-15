@@ -1,22 +1,19 @@
-import { useEffect, useState } from "react";
 import { TouchableOpacity, Text, View, StyleSheet, Image } from "react-native";
+import { useEffect, useState } from "react";
 
-export default function Card(props) {
+export default function CardNew(props) {
   const [pokemon, setPokemon] = useState();
-
   async function fetchPokemon(url) {
     try {
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         setPokemon(data);
-        // console.log(data.sprites.front_default);
       }
     } catch (error) {
       console.log(error);
     }
   }
-
   useEffect(() => {
     fetchPokemon(props.pokemon?.url);
   }, [props.pokemon?.url]);
@@ -24,54 +21,46 @@ export default function Card(props) {
   return (
     <TouchableOpacity
       style={{
-        padding: 20,
-        borderRadius: 10,
-        backgroundColor: backgroundColors[pokemon?.types[0].type.name],
-        elevation: 3,
-        display: "flex",
-        gap: 5,
-        marginBottom: 30,
         position: "relative",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+
+        shadowColor: "grey",
+        backgroundColor: "white",
+        padding: 20,
+        paddingTop: 0,
+
+        borderRadius: 10,
+        shadowRadius: 10,
+        shadowOpacity: 0.2,
+        elevation: 3,
+        gap: 0,
+        marginBottom: 30,
+        marginHorizontal: 30,
       }}
     >
-      <Text style={{ fontWeight: "bold", opacity: 0.4 }}>
-        #0{pokemon?.id && pokemon?.id}
+      <Text
+        style={{
+          fontWeight: "bold",
+          fontSize: "75px",
+          opacity: 0.1,
+          position: "absolute",
+          top: 20,
+        }}
+      >
+        {pokemon?.id !== undefined && pokemon?.id.length == 1
+          ? `#00${pokemon?.id}`
+          : pokemon?.id.length == 2
+          ? `#0${pokemon?.id}`
+          : `#${pokemon?.id}`}
       </Text>
-      <Text style={{ color: "white", fontSize: "30px", fontWeight: "bold" }}>
-        {pokemon?.name &&
-          pokemon?.name[0].toUpperCase() + props.pokemon?.name.slice(1)}
-      </Text>
-      {/* TYPES */}
-      <View style={{ display: "flex", flexDirection: "row" }}>
-        <View
-          style={{
-            backgroundColor: colors[pokemon?.types[0].type.name],
-            alignSelf: "center",
-            padding: 6,
-            paddingHorizontal: 12,
-            borderRadius: 8,
-          }}
-        >
-          <Text
-            style={{
-              color: "white",
-              fontWeight: "semibold",
-            }}
-          >
-            {pokemon?.types[0].type.name[0].toUpperCase() +
-              pokemon?.types[0].type.name.slice(1)}
-          </Text>
-        </View>
-      </View>
-
       <Image
         source={{ uri: pokemon?.sprites.front_default }}
         style={{
-          width: 200,
-          height: 200,
-          position: "absolute",
-          right: -40,
-          top: -35,
+          width: 150,
+          height: 150,
+          marginBottom: -20,
           shadowColor: "black",
           shadowRadius: 5,
           shadowOpacity: 0.2,
@@ -79,6 +68,41 @@ export default function Card(props) {
         onLoad={() => console.log("Image loaded successfully")}
         onError={() => console.log("Image failed to load")}
       />
+      <Text
+        style={{
+          fontSize: "20px",
+          fontWeight: "bold",
+          color: "gray",
+        }}
+      >
+        {pokemon?.name &&
+          pokemon?.name[0].toUpperCase() + props.pokemon?.name.slice(1)}
+      </Text>
+      <Text
+        style={{
+          color: "gray",
+        }}
+      >
+        {pokemon?.description}
+      </Text>
+      <View
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 10,
+        }}
+      >
+        {pokemon?.types.map((type, index) => (
+          <Text
+            style={{
+              color: colors[pokemon?.types[index].type.name],
+              fontWeight: "bold",
+            }}
+          >
+            {pokemon?.types[index].type.name.toUpperCase()}
+          </Text>
+        ))}
+      </View>
     </TouchableOpacity>
   );
 }
@@ -102,45 +126,4 @@ const colors = {
   dragon: "#056EC5",
   dark: "#5B5367",
   fairy: "#ED91E9",
-};
-
-const backgroundColors = {
-  normal: "#C7C5A6",
-  fighting: "#D57974",
-  flying: "#C7B8F6",
-  poison: "#C283C1",
-  ground: "#E9D79E",
-  rock: "#D1C17B",
-  bug: "#C6CF6D",
-  ghost: "#A492BC",
-  steel: "#D1D1DF",
-  fire: "#F6AC7A",
-  water: "#9DB8F5",
-  grass: "#A7DC8F",
-  electric: "#F9E179",
-  psychic: "#FA93B2",
-  ice: "#BBE7E6",
-  dragon: "#A17DF9",
-  dark: "#A39288",
-  fairy: "#F6BDCB",
-};
-
-const styles = StyleSheet.create({
-  card: {
-    padding: 20,
-    borderRadius: 10,
-    backgroundColor: "grey",
-    elevation: 3,
-    display: "flex",
-    gap: 10,
-    marginBottom: 30,
-  },
-});
-
-const login = () => {
-  // kalau email salah, return
-  // kalau email kosong, return
-  // kalau password salah, return
-  // kalau password kosong, return
-  // kalau lolos semua, alert "login berhasil"
 };

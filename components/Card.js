@@ -49,7 +49,9 @@ export default function CardNew(props) {
           top: 20,
         }}
       >
-        {pokemon?.id !== undefined && pokemon?.id.length == 1
+        {pokemon?.id == undefined
+          ? "..."
+          : pokemon?.id.length == 1
           ? `#00${pokemon?.id}`
           : pokemon?.id.length == 2
           ? `#0${pokemon?.id}`
